@@ -3,6 +3,9 @@
 #include <string>
 #include <fstream> 
 #include <vector>
+#include <mutex>
+
+#include <stdio.h> 
 
 
 pplx::task<std::string> write_to_string()
@@ -110,7 +113,7 @@ void task_chains()
 
 
 /*
-    test group 
+    test task group 
 */
 template <typename F>
 void task_group(F func, int count)
@@ -125,9 +128,38 @@ void task_group(F func, int count)
 
     for(auto task :tasks)
     {
+        // 阻塞等待执行结束
         task.get();
-        std::cout << "exec end" << std::endl;
     }
 }
+
+
+/*
+    test task group: concurrence read file  
+*/
+
+template <typename F> 
+void task_group_read_file(F func, int count)
+{
+    std::vector<pplx::task<void>> tasks;
+    for(int i = 0; i < count; ++i)
+    {
+        tasks.emplace_back( pplx::create_task([=] {
+            while(true)
+            {
+                if(!func())
+                {
+                    break;
+                }
+            }
+        }));
+    }
+
+    for(auto& task : tasks)
+    {
+        task.get();
+    }
+}
+
 
 
