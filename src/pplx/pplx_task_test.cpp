@@ -19,14 +19,21 @@ int main()
     std::cout << t2.get() << std::endl;
     */
 
-
-
+    
+    //test2: test chain
     /*
-    test
-        这里sleep 的原因是 "等待"
-    */
     task_chains();
     sleep(1);
     std::cout << "exec end" << std::endl;
+    */
+
+    // test3: test group 
+    task_group([]() {
+        std::cout << "hello world" << std::endl;
+        sleep(2);
+    },3);
+
+
+
     return 0;
 }

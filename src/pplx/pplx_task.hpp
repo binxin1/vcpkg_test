@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream> 
+#include <vector>
 
 
 pplx::task<std::string> write_to_string()
@@ -108,8 +109,25 @@ void task_chains()
 
 
 
-
-
 /*
-    1> auto_retry: 内部创建 create_task & 如果是已知的错误，则进行重试
+    test group 
 */
+template <typename F>
+void task_group(F func, int count)
+{
+    std::vector<pplx::task<void>> tasks;
+    for(int i = 0; i < count; ++i)
+    {
+        tasks.emplace_back(pplx::create_task([=]() {
+            func();
+        }));
+    }
+
+    for(auto task :tasks)
+    {
+        task.get();
+        std::cout << "exec end" << std::endl;
+    }
+}
+
+
